@@ -4,6 +4,7 @@ from re import findall
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from concurrent.futures import ThreadPoolExecutor
 
 
 def find_episode_pages() -> list[str]:
@@ -60,8 +61,11 @@ def download_link(title: str, url: str):
         file.write(res.content)
 
 
-if __name__ == "__main__":
+def worker(page: int):
+    print(f"Running worker for page {page} of 22")
+
     # From Series page, get link to episode pages
+    url = f"https://enpantallas.com/?cat_name=Rebelde&op=search&per_page=20&page={page}"
     page_urls = find_episode_pages()
 
     # From episode pages, get video url and title
@@ -81,9 +85,20 @@ if __name__ == "__main__":
     driver.close()
 
     for title, url in episode_links:
-        print("Starting download")
+        print(f"Starting download @Thread{page}")
         try:
             download_link(title=title, url=url)
             print(f"Downloaded {title}")
         except Exception as err:
             print(f"\nError @ {title}:\n{err}\n")
+
+
+if __name__ == "__main__":
+    pool = ThreadPoolExecutor(max_workers=2)
+
+    for p in range(1, 23):
+        pool.submit(worker, page=p)
+
+    pool.shutdown(wait=True)
+
+    print("Y soy rebelde cuando no sigo a los demás")
