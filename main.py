@@ -5,6 +5,12 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+
+
+def logit(msg: str):
+    with open("rebelde.log", "a+") as f:
+        print(msg, file=f)
 
 
 def find_episode_pages() -> list[str]:
@@ -17,12 +23,11 @@ def find_episode_pages() -> list[str]:
 
     for videobox in videoboxes:
         if not isinstance(videobox, Tag):
-            print(
-                f"""
-                  ERROR: videobox element is of type {type(videobox)}, expected Tag
-                  Element:
-                  {videobox}
-                """
+            logit(
+                f"""find_episode_pages() :: isinstance(videobox, Tag)
+                ERROR: videobox element is of type {type(videobox)}, expected Tag
+                Element:
+                {videobox}"""
             )
             continue
 
@@ -31,6 +36,14 @@ def find_episode_pages() -> list[str]:
             href_attr = meta["href"]
             href = href_attr if isinstance(href_attr, str) else href_attr[0]
             pages.append(href)
+        else:
+            logit(
+                f"""find_episode_pages() :: isinstance(meta, Tag)
+                ERROR: meta element is of type {type(meta)}, expected Tag
+                Element:
+                {meta}
+                """
+            )
 
     return pages
 
@@ -63,7 +76,7 @@ def download_link(title: str, url: str):
 
 def worker(page: int):
     print(f"Running worker for page {page} of 22")
-
+    logit(f"{datetime.now()} - Start Thread@{page}")
     # From Series page, get link to episode pages
     url = f"https://enpantallas.com/?cat_name=Rebelde&op=search&per_page=20&page={page}"
     page_urls = find_episode_pages()
@@ -79,8 +92,8 @@ def worker(page: int):
         try:
             episode_links.append(find_download_link(url, driver=driver))
         except:
-            print(
-                f"Failed {'at first attempt' if not episode_links else f'after {episode_links[-1][0]}'}"
+            logit(
+                f"Thread{page}: Failed {'at first item' if not episode_links else f'after {episode_links[-1][0]}'}"
             )
     driver.close()
 
@@ -90,10 +103,13 @@ def worker(page: int):
             download_link(title=title, url=url)
             print(f"Downloaded {title}")
         except Exception as err:
-            print(f"\nError @ {title}:\n{err}\n")
+            msg = f"\nError @ {title}:\n{err}\n"
+            print(msg)
+            logit(msg)
 
 
 if __name__ == "__main__":
+    logit(f"Started at {datetime.now()}")
     pool = ThreadPoolExecutor(max_workers=2)
 
     for p in range(1, 23):
@@ -102,3 +118,4 @@ if __name__ == "__main__":
     pool.shutdown(wait=True)
 
     print("Y soy rebelde cuando no sigo a los demás")
+    logit(f"Finished at {datetime.now()}")
