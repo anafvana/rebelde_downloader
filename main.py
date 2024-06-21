@@ -25,8 +25,11 @@ def find_episode_pages() -> list[str]:
             )
             continue
 
-        href = videobox.find("a", attrs={"class": "title"}, href=True)["href"]
-        pages.append(href)
+        meta = videobox.find("a", attrs={"class": "title"}, href=True)
+        if isinstance(meta, Tag):
+            href_attr = meta["href"]
+            href = href_attr if isinstance(href_attr, str) else href_attr[0]
+            pages.append(href)
 
     return pages
 
