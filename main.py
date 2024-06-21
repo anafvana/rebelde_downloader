@@ -50,7 +50,11 @@ def find_download_link(url: str, driver: webdriver.Chrome) -> tuple[str, str]:
 
 
 def download_link(title: str, url: str):
-    pass
+    res = get(url)
+    res.raise_for_status()
+
+    with open(f"Downloaded/{title}.mp4", mode="wb+") as file:
+        file.write(res.content)
 
 
 if __name__ == "__main__":
@@ -72,3 +76,11 @@ if __name__ == "__main__":
                 f"Failed {'at first attempt' if not episode_links else f'after {episode_links[-1][0]}'}"
             )
     driver.close()
+
+    for title, url in episode_links:
+        print("Starting download")
+        try:
+            download_link(title=title, url=url)
+            print(f"Downloaded {title}")
+        except Exception as err:
+            print(f"\nError @ {title}:\n{err}\n")
