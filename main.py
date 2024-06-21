@@ -2,7 +2,6 @@ from requests import get
 from bs4 import BeautifulSoup, Tag
 from re import findall
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -32,7 +31,7 @@ def find_episode_pages() -> list[str]:
     return pages
 
 
-def find_download_link(url: str, driver) -> tuple[str, str]:
+def find_download_link(url: str, driver: webdriver.Chrome) -> tuple[str, str]:
     driver.get(url)
     html = driver.page_source
 
