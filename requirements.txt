@@ -1,4 +1,6 @@
 requests
+types-requests
 beautifulsoup4
+types-beautifulsoup4
 selenium>=4.0.0
 webdriver-manager
