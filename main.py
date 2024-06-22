@@ -13,8 +13,8 @@ def logit(msg: str):
         print(msg, file=f)
 
 
-def find_episode_pages() -> list[str]:
-    res = get("https://enpantallas.com/category/Rebelde")
+def find_episode_pages(url: str) -> list[str]:
+    res = get(url=url)
     res.raise_for_status()
 
     soup = BeautifulSoup(res.text, "html.parser")
@@ -79,7 +79,7 @@ def worker(page: int):
     logit(f"{datetime.now()} - Start Thread@{page}")
     # From Series page, get link to episode pages
     url = f"https://enpantallas.com/?cat_name=Rebelde&op=search&per_page=20&page={page}"
-    page_urls = find_episode_pages()
+    page_urls = find_episode_pages(url=url)
 
     # From episode pages, get video url and title
     options = webdriver.ChromeOptions()
@@ -88,19 +88,19 @@ def worker(page: int):
         service=ChromeService(ChromeDriverManager().install()), options=options
     )
     episode_links = []
-    for url in page_urls:
+    for page_url in page_urls:
         try:
-            episode_links.append(find_download_link(url, driver=driver))
+            episode_links.append(find_download_link(page_url, driver=driver))
         except:
             logit(
                 f"Thread{page}: Failed {'at first item' if not episode_links else f'after {episode_links[-1][0]}'}"
             )
     driver.close()
 
-    for title, url in episode_links:
+    for title, page_url in episode_links:
         print(f"Starting download @Thread{page}")
         try:
-            download_link(title=title, url=url)
+            download_link(title=title, url=page_url)
             print(f"Downloaded {title}")
         except Exception as err:
             msg = f"\nError @ {title}:\n{err}\n"
