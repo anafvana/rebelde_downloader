@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from os.path import isfile
 
 
 def logit(msg: str):
@@ -67,10 +68,14 @@ def find_download_link(url: str, driver: webdriver.Chrome) -> tuple[str, str]:
 
 
 def download_link(title: str, url: str):
+    path = f"Downloaded/{title}.mp4"
+    if isfile(path=path):
+        return
+
     res = get(url)
     res.raise_for_status()
 
-    with open(f"Downloaded/{title}.mp4", mode="wb+") as file:
+    with open(path, mode="wb+") as file:
         file.write(res.content)
 
 
