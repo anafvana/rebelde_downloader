@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup, Tag
 from re import findall
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -88,11 +89,23 @@ def worker(page: int):
 
     # From episode pages, get video url and title
     try:
+        # FOR DESKTOP (Tested on MacOS)
         options = webdriver.ChromeOptions()
         options.add_argument("headless")
         driver = webdriver.Chrome(
             service=ChromeService(ChromeDriverManager().install()), options=options
         )
+
+        # FOR SERVERS (Tested on RH server) - REQUIRES MANUAL INSTALL
+        # options = Options()
+        # options.add_argument("--headless")
+        # options.add_argument("--no-sandbox")
+        # options.add_argument("--disable-dev-shm-usage")
+        # driver = webdriver.Chrome(
+        #     service=ChromeService(executable_path="/usr/bin/chromedriver"),
+        #     options=options,
+        # )
+
     except Exception as err:
         print(f"Failed to create driver @Thread{page}")
         logit(f"ERROR @Thread{page} - Could not create driver\n{err}")
