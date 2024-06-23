@@ -8,6 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from os.path import isfile
+from sys import base_prefix, prefix
 
 
 def logit(msg: str):
@@ -134,6 +135,11 @@ def worker(page: int):
 
 if __name__ == "__main__":
     logit(f"Started at {datetime.now()}")
+    if prefix == base_prefix:
+        logit(f"ERROR: not in venv. prefix={prefix}; base_prefix={base_prefix}")
+        print("FATAL: Not in venv. Terminating")
+        exit(1)
+
     pool = ThreadPoolExecutor(max_workers=2)
 
     for p in range(1, 23):
