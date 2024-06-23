@@ -87,19 +87,25 @@ def worker(page: int):
     page_urls = find_episode_pages(url=url)
 
     # From episode pages, get video url and title
-    options = webdriver.ChromeOptions()
-    options.add_argument("headless")
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()), options=options
-    )
+    try:
+        options = webdriver.ChromeOptions()
+        options.add_argument("headless")
+        driver = webdriver.Chrome(
+            service=ChromeService(ChromeDriverManager().install()), options=options
+        )
+    except Exception as err:
+        print(f"Failed to create driver @Thread{page}")
+        logit(f"ERROR @Thread{page} - Could not create driver\n{err}")
+
     episode_links = []
     for page_url in page_urls:
         try:
             episode_links.append(find_download_link(page_url, driver=driver))
-        except:
-            logit(
-                f"Thread{page}: Failed {'at first item' if not episode_links else f'after {episode_links[-1][0]}'}"
+        except Exception as err:
+            print(
+                f"Thread{page}: Failed {'at first item' if not episode_links else f'after {episode_links[-1][0]}'}. URL: {page_url}"
             )
+            logit(f"Failed @Thread{page} {page_url}:\n{err}")
     driver.close()
 
     for title, page_url in episode_links:
