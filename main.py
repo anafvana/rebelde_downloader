@@ -1,14 +1,15 @@
-from requests import get
-from bs4 import BeautifulSoup, Tag
-from re import findall
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from os.path import isfile
+from re import findall
 from sys import base_prefix, prefix
+
+from bs4 import BeautifulSoup, Tag
+from requests import get
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def logit(msg: str):
