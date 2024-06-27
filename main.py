@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from os import makedirs
 from os.path import isfile
 from re import findall
 from sys import base_prefix, prefix
@@ -140,6 +141,8 @@ if __name__ == "__main__":
         logit(f"ERROR: not in venv. prefix={prefix}; base_prefix={base_prefix}")
         print("FATAL: Not in venv. Terminating")
         exit(1)
+
+    makedirs("./Downloaded", exist_ok=True)
 
     pool = ThreadPoolExecutor(max_workers=2)
 
